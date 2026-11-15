@@ -50,6 +50,14 @@ cd L:\Work\DeskBeam
 dotnet build DeskBeam.slnx
 ```
 
+GitHub Actions also builds the solution and uploads self-contained Windows x64 Host and Client
+ZIPs on pushes and pull requests. To publish a release, run **Build and release** from the
+Actions tab, select the branch to release, and enter a new tag such as `v1.2.3`. Optionally mark
+it as a prerelease. The workflow tags the selected commit and publishes both ZIPs with generated
+release notes. Tags must be new; if release creation fails after the tag is created, remove or
+otherwise handle that tag before retrying. Extract each ZIP before running its executable; the
+.NET runtime is included, but the host still needs ViGEmBus for controller support.
+
 End-to-end headless check (starts a host, rejects a wrong PIN, streams keyframes and delta tiles,
 checks composition and JPEG decode, ping, stats, shutdown):
 
