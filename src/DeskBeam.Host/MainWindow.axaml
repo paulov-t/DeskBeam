@@ -1,0 +1,247 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:DeskBeam.Host.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="1180" d:DesignHeight="800"
+        x:Class="DeskBeam.Host.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        x:CompileBindings="True"
+        Title="DeskBeam Host"
+        Width="1180" Height="800"
+        MinWidth="900" MinHeight="620"
+        Background="#0A0D13">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- Header -->
+        <Border Grid.Row="0" Background="#111722" Padding="16,12">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <StackPanel Grid.Column="0" Spacing="2">
+                    <TextBlock Text="DeskBeam Host" FontSize="20" FontWeight="SemiBold" />
+                    <TextBlock Text="share this desktop · remote Xbox controller" Classes="hint" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Margin="24,0" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding StatusText}" IsVisible="{Binding !HasError}"
+                               TextTrimming="CharacterEllipsis" />
+                    <TextBlock Text="{Binding StatusText}" IsVisible="{Binding HasError}"
+                               Foreground="#FF8A73" TextWrapping="Wrap" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <Button Content="Start host" Command="{Binding StartCommand}"
+                            IsEnabled="{Binding StartEnabled}" MinWidth="110" />
+                    <Button Content="Stop" Command="{Binding StopCommand}"
+                            IsEnabled="{Binding StopEnabled}" MinWidth="80" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="1" ColumnDefinitions="410,*" Margin="14" ColumnSpacing="14">
+
+            <!-- Settings -->
+            <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto">
+                <StackPanel Spacing="12">
+
+                    <Border Classes="card">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="Session" Classes="section" />
+
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="Host name shown to viewers" Classes="label" />
+                                <TextBox Text="{Binding ServerName}" />
+                            </StackPanel>
+
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                <StackPanel Grid.Column="0" Spacing="4">
+                                    <TextBlock Text="PIN (viewers must type this)" Classes="label" />
+                                    <TextBox Text="{Binding Pin}" PasswordChar="•" />
+                                </StackPanel>
+                                <Button Grid.Column="1" Content="New PIN" VerticalAlignment="Bottom"
+                                        Command="{Binding RegeneratePinCommand}" />
+                            </Grid>
+
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="Control port (video = +1, audio UDP = +2)" Classes="label" />
+                                <TextBox Text="{Binding PortText}" Width="130" HorizontalAlignment="Left" />
+                            </StackPanel>
+
+                            <TextBlock Classes="hint" Text="{Binding RequiredPorts, StringFormat='Firewall: allow inbound {0}.'}" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Classes="card">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="Video" Classes="section" />
+
+                            <StackPanel Spacing="4">
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                    <TextBlock Grid.Column="0" Text="Monitor" Classes="label" />
+                                    <Button Grid.Column="1" Content="Refresh" FontSize="11" Padding="8,2"
+                                            Command="{Binding RefreshMonitorsCommand}" />
+                                </Grid>
+                                <ComboBox ItemsSource="{Binding MonitorChoices}"
+                                          SelectedIndex="{Binding SelectedMonitorIndex}"
+                                          HorizontalAlignment="Stretch" />
+                            </StackPanel>
+
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="Capture API" Classes="label" />
+                                <ComboBox ItemsSource="{Binding CaptureApiChoices}"
+                                          SelectedIndex="{Binding CaptureApiIndex}"
+                                          HorizontalAlignment="Stretch" />
+                                <TextBlock Classes="hint"
+                                           Text="Auto uses Windows Graphics Capture, then DXGI, then GDI. Games must run borderless/windowed fullscreen: exclusive fullscreen bypasses Windows capture." />
+                            </StackPanel>
+
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="Capture resolution (scaled)" Classes="label" />
+                                <ComboBox ItemsSource="{Binding ResolutionChoices}"
+                                          SelectedIndex="{Binding ResolutionIndex}"
+                                          HorizontalAlignment="Stretch" />
+                            </StackPanel>
+
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="Frame rate" Classes="label" />
+                                <ComboBox ItemsSource="{Binding FpsChoicesLabels}"
+                                          SelectedIndex="{Binding FpsIndex}"
+                                          HorizontalAlignment="Stretch" />
+                            </StackPanel>
+
+                            <StackPanel Spacing="2">
+                                <TextBlock Text="{Binding QualityLabel}" Classes="label" />
+                                <Slider Minimum="40" Maximum="90" TickFrequency="5"
+                                        IsSnapToTickEnabled="True" Value="{Binding Quality}" />
+                                <TextBlock Classes="hint"
+                                           Text="Higher quality looks sharper but needs more upload bandwidth." />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Classes="card">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Audio" Classes="section" />
+                            <CheckBox Content="Stream desktop audio to viewers"
+                                      IsChecked="{Binding EnableAudio}" />
+                            <StackPanel Spacing="2">
+                                <TextBlock Text="{Binding AudioBitrateLabel}" Classes="label" />
+                                <Slider Minimum="32" Maximum="128" TickFrequency="8"
+                                        IsSnapToTickEnabled="True" Value="{Binding AudioBitrate}" />
+                            </StackPanel>
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="Never send audio from these processes" Classes="label" />
+                                <TextBox Text="{Binding AudioExcludedProcesses}" />
+                                <TextBlock Classes="hint"
+                                           Text="Comma-separated process names. Discord is excluded by default and keeps playing locally: its audio is removed from the stream, not muted on this PC." />
+                            </StackPanel>
+                            <TextBlock Classes="hint"
+                                       Text="Audio uses its own UDP channel (control + 2). It is always dropped before video; a congested viewer is muted instead of weakening the picture." />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Classes="card">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Input" Classes="section" />
+                            <CheckBox Content="Allow remote mouse and keyboard"
+                                      IsChecked="{Binding AllowInput}" />
+                            <CheckBox Content="Create a virtual Xbox 360 pad for the viewer"
+                                      IsChecked="{Binding EnableVirtualGamepad}" />
+                            <TextBlock Classes="hint"
+                                       Text="The virtual pad requires ViGEmBus (github.com/nefarius/ViGEmBus/releases). Games see it like a plugged-in Xbox controller." />
+                            <CheckBox Content="Draw the local mouse cursor" IsChecked="{Binding IncludeCursor}" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Classes="card">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Internet play" Classes="section" />
+                            <CheckBox Content="Map ports automatically when the host starts"
+                                      IsChecked="{Binding MapPortsOnStart}" />
+                            <Button Content="{Binding MapButtonText}" Command="{Binding MapPortsCommand}"
+                                    IsEnabled="{Binding MapEnabled}" HorizontalAlignment="Stretch" />
+                            <Border Background="#1B2331" CornerRadius="8" Padding="10">
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                    <StackPanel Grid.Column="0" Spacing="2">
+                                        <TextBlock Text="Share this address" Classes="label" />
+                                        <SelectableTextBlock Text="{Binding ShareText}" FontFamily="Consolas,monospace"
+                                                             TextWrapping="Wrap" />
+                                    </StackPanel>
+                                    <Button Grid.Column="1" Content="Copy" VerticalAlignment="Center"
+                                            Click="OnCopyShare" />
+                                </Grid>
+                            </Border>
+                            <TextBlock Classes="hint"
+                                       Text="Same network: use the LAN address. Internet: enable UPnP on the router, or forward TCP control, TCP control + 1 and UDP control + 2 manually." />
+                        </StackPanel>
+                    </Border>
+
+                    <TextBlock Classes="hint"
+                               Text="Port, name and audio on/off changes take effect on the next start. Resolution, frame rate, quality, monitor, input and audio bitrate/exclusions apply live." />
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- Live status -->
+            <Grid Grid.Column="1" RowDefinitions="Auto,Auto,*,2*" RowSpacing="12">
+
+                <Border Grid.Row="0" Classes="card">
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="Pipeline" Classes="section" />
+                        <TextBlock Text="{Binding StatsText}" FontFamily="Consolas,monospace" FontSize="13" />
+                        <TextBlock Text="{Binding AudioStatus}" Classes="hint" />
+                        <TextBlock Text="{Binding PadStatus}" Classes="hint" />
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Row="1" Classes="card">
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="Connected players" Classes="section" />
+                        <TextBlock Text="Nobody is connected yet." Classes="hint"
+                                   IsVisible="{Binding !HasClients}" />
+                        <ItemsControl ItemsSource="{Binding Clients}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:ClientRow">
+                                    <Border Background="#1B2331" CornerRadius="8" Padding="10" Margin="0,0,0,6">
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <StackPanel Grid.Column="0" Spacing="2">
+                                                <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+                                                <TextBlock Text="{Binding Remote}" Classes="hint" />
+                                            </StackPanel>
+                                            <TextBlock Grid.Column="1" Text="{Binding Summary}"
+                                                       FontFamily="Consolas,monospace" FontSize="12"
+                                                       VerticalAlignment="Center" Opacity="0.8" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Row="2" Classes="card">
+                    <Grid RowDefinitions="Auto,*">
+                        <TextBlock Grid.Row="0" Text="Log" Classes="section" />
+                        <ListBox Grid.Row="1" x:Name="LogList"
+                                 ItemsSource="{Binding LogLines}"
+                                 Background="#0D1119" CornerRadius="6"
+                                 FontFamily="Consolas,monospace" FontSize="12" />
+                    </Grid>
+                </Border>
+
+                <Border Grid.Row="3" Classes="card">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="How to connect a player" Classes="section" />
+                        <TextBlock Classes="hint"
+                                   Text="1. Start the host and share the address + PIN." />
+                        <TextBlock Classes="hint"
+                                   Text="2. On the remote PC, run DeskBeam.Client, enter address, port and PIN, then press Connect." />
+                        <TextBlock Classes="hint"
+                                   Text="3. Plug an Xbox controller into the remote PC. It appears as controller 2 on this host while streaming." />
+                        <TextBlock Classes="hint"
+                                   Text="Tip: run the host as administrator once so Windows Firewall allows both TCP ports and the UDP audio port on private and public networks." />
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>

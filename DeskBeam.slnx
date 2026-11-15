@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/DeskBeam.Client/DeskBeam.Client.csproj" />
+    <Project Path="src/DeskBeam.Core/DeskBeam.Core.csproj" />
+    <Project Path="src/DeskBeam.Engine/DeskBeam.Engine.csproj" />
+    <Project Path="src/DeskBeam.Host/DeskBeam.Host.csproj" />
+  </Folder>
+  <Folder Name="/tools/">
+    <Project Path="tools/DeskBeam.Smoke/DeskBeam.Smoke.csproj" />
+  </Folder>
+</Solution>

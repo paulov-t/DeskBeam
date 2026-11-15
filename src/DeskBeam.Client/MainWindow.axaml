@@ -1,0 +1,121 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:DeskBeam.Client.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="800"
+        x:Class="DeskBeam.Client.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        x:CompileBindings="True"
+        Title="DeskBeam"
+        Width="1280" Height="800"
+        MinWidth="1000" MinHeight="560"
+        Background="#0A0D13">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+
+        <!-- Connection bar -->
+        <Border Grid.Row="0" Background="#111722" Padding="14,12">
+            <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,*,Auto">
+                <StackPanel Grid.Column="0" Spacing="2" Margin="0,0,18,0" VerticalAlignment="Center">
+                    <TextBlock Text="DeskBeam" FontSize="18" FontWeight="SemiBold" />
+                    <TextBlock Text="remote desktop + controller" Classes="hint" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Spacing="4" Margin="0,0,10,0">
+                    <TextBlock Text="Host / IP" Classes="label" />
+                    <TextBox Text="{Binding Host}" Width="170" PlaceholderText="192.168.1.20"
+                             IsEnabled="{Binding !IsConnected}" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" Spacing="4" Margin="0,0,10,0">
+                    <TextBlock Text="Port" Classes="label" />
+                    <TextBox Text="{Binding PortText}" Width="80"
+                             IsEnabled="{Binding !IsConnected}" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="3" Spacing="4" Margin="0,0,10,0">
+                    <TextBlock Text="PIN" Classes="label" />
+                    <TextBox Text="{Binding Pin}" Width="110" PasswordChar="•"
+                             IsEnabled="{Binding !IsConnected}" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="4" Spacing="4" Margin="0,0,10,0">
+                    <TextBlock Text="Your name" Classes="label" />
+                    <TextBox Text="{Binding ClientName}" Width="150"
+                             IsEnabled="{Binding !IsConnected}" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="6" Orientation="Horizontal" Spacing="8" VerticalAlignment="Bottom">
+                    <Button Content="Connect" Command="{Binding ConnectCommand}"
+                            IsEnabled="{Binding ConnectEnabled}" MinWidth="100" />
+                    <Button Content="Disconnect" Command="{Binding DisconnectCommand}"
+                            IsEnabled="{Binding DisconnectEnabled}" MinWidth="110" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Video surface -->
+        <Grid Grid.Row="1" Background="Black">
+            <Image Name="VideoImage"
+                   Source="{Binding Frame}"
+                   Stretch="Uniform"
+                   Focusable="True"
+                   RenderOptions.BitmapInterpolationMode="LowQuality" />
+
+            <StackPanel IsVisible="{Binding ShowPlaceholder}"
+                        IsHitTestVisible="False"
+                        HorizontalAlignment="Center" VerticalAlignment="Center"
+                        Spacing="10" MaxWidth="440">
+                <TextBlock Text="Not connected" FontSize="30" FontWeight="SemiBold"
+                           HorizontalAlignment="Center" />
+                <TextBlock Classes="hint" HorizontalAlignment="Center" TextAlignment="Center"
+                           Text="Enter the host address and PIN, then press Connect. Click the video once to give it keyboard focus." />
+            </StackPanel>
+
+            <!-- Live stats -->
+            <Border IsVisible="{Binding ShowStats}"
+                    IsHitTestVisible="False"
+                    HorizontalAlignment="Left" VerticalAlignment="Top"
+                    Margin="12" Padding="12,8"
+                    Background="#CC0E141E" CornerRadius="8">
+                <TextBlock Text="{Binding StatsText}" FontFamily="Consolas,monospace"
+                           FontSize="12" Foreground="#9FE6B8" />
+            </Border>
+
+            <!-- Host warning (e.g. ViGEmBus missing) -->
+            <Border IsVisible="{Binding HasWarning}"
+                    HorizontalAlignment="Right" VerticalAlignment="Top"
+                    Margin="12" Padding="12,8" MaxWidth="420"
+                    Background="#EE4A2F16" CornerRadius="8">
+                <Grid ColumnDefinitions="*,Auto">
+                    <TextBlock Grid.Column="0" Text="{Binding WarningText}"
+                               TextWrapping="Wrap" FontSize="12" Foreground="#FFD7A8"
+                               VerticalAlignment="Center" />
+                    <Button Grid.Column="1" Content="Dismiss" Margin="10,0,0,0"
+                            Command="{Binding DismissWarningCommand}" />
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- Status bar -->
+        <Border Grid.Row="2" Background="#111722" Padding="14,10">
+            <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="16">
+                    <TextBlock Text="{Binding StatusText}" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding ControllerText}" Classes="label" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="16">
+                    <CheckBox Content="Forward mouse" IsChecked="{Binding ForwardMouse}"
+                              IsEnabled="{Binding IsConnected}" />
+                    <CheckBox Content="Forward keyboard" IsChecked="{Binding ForwardKeyboard}"
+                              IsEnabled="{Binding IsConnected}" />
+                    <CheckBox Content="Mute audio" IsChecked="{Binding MuteAudio}"
+                              IsEnabled="{Binding IsConnected}" />
+                    <CheckBox Content="Stats" IsChecked="{Binding ShowStats}" />
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
