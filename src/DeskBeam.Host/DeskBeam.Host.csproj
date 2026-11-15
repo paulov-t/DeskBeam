@@ -7,6 +7,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <RootNamespace>DeskBeam.Host</RootNamespace>
         <ApplicationManifest>app.manifest</ApplicationManifest>
+        <ApplicationIcon>..\..\assets\DeskBeam.ico</ApplicationIcon>
         <PublishTrimmed>false</PublishTrimmed>
         <PublishSingleFile>true</PublishSingleFile>
         <PublishReadyToRun>false</PublishReadyToRun>
@@ -23,6 +24,7 @@
     <ItemGroup>
         <ProjectReference Include="..\DeskBeam.Core\DeskBeam.Core.csproj" />
         <ProjectReference Include="..\DeskBeam.Engine\DeskBeam.Engine.csproj" />
+        <AvaloniaResource Include="..\..\assets\DeskBeam.ico" Link="Assets\DeskBeam.ico" />
     </ItemGroup>
 
     <PropertyGroup Condition="'$(Configuration)'=='Release'">
